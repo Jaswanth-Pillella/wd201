@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex-col items-center justify-center min-h-screen space-y-10">
+
+  <div class="w-full max-w-sm mx-auto bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-center text-2xl font-bold mb-6">Registration Form</h2>
+    
+    <form id="registrationForm" class="space-y-4">
+      <div>
+        <label class="block font-medium text-gray-700">Name</label>
+        <input type="text" id="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300" placeholder="Enter full name" required>
+      </div>
+      <div>
+        <label class="block font-medium text-gray-700">Email</label>
+        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300" placeholder="Enter email" required>
+      </div>
+      <div>
+        <label class="block font-medium text-gray-700">Password</label>
+        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300" placeholder="Enter password" required>
+      </div>
+      <div>
+        <label class="block font-medium text-gray-700">Date of Birth</label>
+        <input type="date" id="dob" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-green-300" placeholder="dd/mm/yyyy" required>
+      </div>
+      <div>
+        <label class="inline-flex items-center">
+          <input type="checkbox" id="terms" class="form-checkbox h-5 w-5 text-green-600" required>
+          <span class="ml-2">Accept Terms & Conditions</span>
+        </label>
+      </div>
+      <button type="submit" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">Submit</button>
+    </form>
+  </div>
+
+  <!-- Entries Table -->
+  <div class="mt-10 w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-center text-2xl font-bold mb-6">Entries</h2>
+    <table class="w-full text-left table-auto border-collapse">
+      <thead>
+        <tr>
+          <th class="border px-4 py-2">Name</th>
+          <th class="border px-4 py-2">Email</th>
+          <th class="border px-4 py-2">Password</th>
+          <th class="border px-4 py-2">DOB</th>
+          <th class="border px-4 py-2">Accepted Terms?</th>
+        </tr>
+      </thead>
+      <tbody id="entriesTable" class="text-gray-700">
+        <!-- Entries will be added here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Get the date input field
+    const dobInput = document.getElementById('dob');
+
+    // Calculate the minimum and maximum date for age 18 to 55
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 55, today.getMonth(), today.getDate()).toISOString().split('T')[0]; // 55 years ago
+    const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()).toISOString().split('T')[0]; // 18 years ago
+
+    // Set the min and max attributes on the date input field
+    dobInput.setAttribute('min', minDate);
+    dobInput.setAttribute('max', maxDate);
+
+    const form = document.getElementById('registrationForm');
+    const entriesTable = document.getElementById('entriesTable');
+
+    // Load entries from local storage when the page loads
+    window.addEventListener('load', loadEntriesFromLocalStorage);
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const dob = document.getElementById('dob').value;
+      const termsAccepted = document.getElementById('terms').checked ? 'true' : 'false';
+
+      // Create an entry object
+      const entry = { name, email, password, dob, termsAccepted };
+
+      // Save the entry to local storage
+      saveEntryToLocalStorage(entry);
+
+      // Add a new row to the table
+      addEntryToTable(entry);
+
+      // Clear form fields
+      form.reset();
+    });
+
+    // Function to save entry to local storage
+    function saveEntryToLocalStorage(entry) {
+      // Get existing entries from local storage or initialize as an empty array
+      let entries = JSON.parse(localStorage.getItem('user-entries')) || [];
+      
+      // Add the new entry to the array
+      entries.push(entry);
+      
+      // Save the updated array back to local storage
+      localStorage.setItem('user-entries', JSON.stringify(entries));
+    }
+
+    // Function to load entries from local storage and display them
+    function loadEntriesFromLocalStorage() {
+      let entries = JSON.parse(localStorage.getItem('user-entries')) || [];
+      
+      // Clear the table body to prevent duplicates
+      entriesTable.innerHTML = '';
+
+      // Add each entry to the table
+      entries.forEach(entry => {
+        addEntryToTable(entry);
+      });
+    }
+
+    // Function to add an entry to the table
+    function addEntryToTable(entry) {
+      // Create a new row and cells
+      let row = entriesTable.insertRow();
+      let cellName = row.insertCell(0);
+      let cellEmail = row.insertCell(1);
+      let cellPassword = row.insertCell(2);
+      let cellDob = row.insertCell(3);
+      let cellTerms = row.insertCell(4);
+      
+      // Set the text content of the cells
+      cellName.textContent = entry.name;
+      cellEmail.textContent = entry.email;
+      cellPassword.textContent = entry.password;
+      cellDob.textContent = entry.dob;
+      cellTerms.textContent = entry.termsAccepted;
+    }
+  </script>
+
+</body>
+</html>
